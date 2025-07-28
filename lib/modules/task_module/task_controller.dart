@@ -5,14 +5,28 @@ import 'package:projekx_app/services/task_service.dart';
 
 class TaskController extends GetxController {
   RxList<TaskModel> tasks = <TaskModel>[].obs;
+  RxList<TaskModel> myTasks = <TaskModel>[].obs;
   RxBool isLoading = false.obs;
 
-  /// NEW: Reactive fields for add task form
-  Rx<Color> newTaskColor = Colors.blue.obs; // default color
+
+  Rx<Color> newTaskColor = Colors.blue.obs;
   RxString newTaskStatus = 'New'.obs;
   Rx<DateTime?> newTaskDueDate = Rx<DateTime?>(null);
 
-  /// Fetch tasks filtered by project ID
+
+    Future<void> fetchMyTasks() async {
+    try {
+      isLoading.value = true;
+      final fetchedTasks = await TaskService.fetchMyTasks();
+      myTasks.assignAll(fetchedTasks);
+    } catch (e) {
+      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
   Future<void> fetchTasksForProject(String projectId) async {
     try {
       isLoading.value = true;
@@ -25,13 +39,17 @@ class TaskController extends GetxController {
     }
   }
 
-  /// Add new task
+
+
+
+
   Future<void> addTask({
     required String name,
     required String projectId,
     String status = "New",
     String? color,
     DateTime? dueDate,
+    String? asigned_to_user,
   }) async {
     try {
       isLoading.value = true;
@@ -41,14 +59,43 @@ class TaskController extends GetxController {
         status: status,
         color: color,
         dueDate: dueDate,
+        asigned_to_user: asigned_to_user,
       );
-      await fetchTasksForProject(projectId); // refresh list
-      Get.snackbar('Success', 'Task added successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Get.theme.primaryColor,
-          colorText: Get.theme.scaffoldBackgroundColor);
+      await fetchTasksForProject(projectId);
+      Get.snackbar(
+        'Success',
+        'Task added successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.primaryColor,
+        colorText: Get.theme.scaffoldBackgroundColor,
+      );
     } catch (e) {
       print('Error adding task: $e');
+      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> updateTaskFields({   
+    required String taskId,
+    required Map<String, dynamic> fieldsToUpdate,
+    required String projectId,
+  }) async {
+    if (fieldsToUpdate.isEmpty) return;
+    try {
+      isLoading.value = true;
+      await TaskService.updateTask(taskId, fieldsToUpdate);
+      await fetchTasksForProject(projectId);
+      Get.snackbar(
+        'Success',
+        'Task updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.primaryColor,
+        colorText: Get.theme.scaffoldBackgroundColor,
+      );
+    } catch (e) {
+      print('Error updating task: $e');
       Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;

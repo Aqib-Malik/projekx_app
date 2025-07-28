@@ -52,7 +52,7 @@ class LoginController extends GetxController {
       print("user id: $userId");
 
       Get.snackbar("Success", "Login successful");
-      Get.offAllNamed('/projects'); 
+      Get.offAllNamed('/bottomnavbar'); 
     } else {
       print(response);
       Get.snackbar("Error", "Login failed. Please try again");

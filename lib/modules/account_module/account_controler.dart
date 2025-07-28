@@ -275,7 +275,7 @@ Future<bool> inviteUserByAddingRequestList(String targetUserId, String currentUs
       body: body,
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 204) {
       print('✅ Invitation sent.');
       return true;
     } else {
@@ -286,6 +286,27 @@ Future<bool> inviteUserByAddingRequestList(String targetUserId, String currentUs
   }
   return false;
 }
+
+
+
+/// Fetch user by id for viewing details (used in team member dialog)
+Future<UserModel?> fetchUserById(String userId) async {
+  try {
+    final url = Uri.parse('https://projekx.bubbleapps.io/api/1.1/obj/user/$userId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['response'];
+      return UserModel.fromJson(data);
+    } else {
+      print('❌ Failed to fetch user by id. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('❌ Error fetching user by id: $e');
+  }
+  return null;
+}
+
 
 
 }

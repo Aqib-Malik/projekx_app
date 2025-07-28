@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:projekx_app/comm_widgets/invite_team_dialog.dart';
 import 'package:projekx_app/comm_widgets/manage_team_modal.dart';
 import 'package:projekx_app/common/colors.dart';
 import 'package:projekx_app/modules/account_module/account_controler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountView extends StatefulWidget {
   const AccountView({super.key});
@@ -16,7 +16,6 @@ class AccountView extends StatefulWidget {
 class _AccountViewState extends State<AccountView> {
   final AccountController controller = Get.put(AccountController());
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +25,11 @@ class _AccountViewState extends State<AccountView> {
         elevation: 0,
         title: const Text(
           "My Account",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: AppColors.text,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
       ),
@@ -36,51 +39,70 @@ class _AccountViewState extends State<AccountView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// Profile Card
-            Obx(
-              (){ 
-                    final user = controller.user.value;
+            Obx(() {
+              final user = controller.user.value;
 
-                
-                return user == null
-          ? const Center(child: CircularProgressIndicator()):Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.15),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 32,
-                      backgroundColor: Color(0xffE0E0E0),
-                      child: Icon(
-                        Icons.person,
-                        size: 36,
-                        color: Colors.grey,
+              return user == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primary.withOpacity(0.92),
+                            AppColors.primary.withOpacity(0.8)
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.25),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:  [
-                         Text(user.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          Text(user.email, style: const TextStyle(color: Colors.grey)),
-                     ],
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 32,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              LucideIcons.user,
+                              size: 32,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user.name,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  user.email,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontSize: 13.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              );}
-            ),
+                    );
+            }),
 
             const SizedBox(height: 24),
 
@@ -89,38 +111,58 @@ class _AccountViewState extends State<AccountView> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withOpacity(0.08),
                     blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  Obx(()=>
-                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children:  [
-                        _StatItem(title: "My Projects", count:controller.total_projec.value.isEmpty ? 0 : int.parse(controller.total_projec.value) ),
-                        _StatItem(title: "My Tasks", count: 0),
-                      ],
-                    ),
-                  ),
+                  Obx(() => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _StatItem(
+                            icon: LucideIcons.folderKanban,
+                            title: "My Projects",
+                            count: controller.total_projec.value.isEmpty
+                                ? 0
+                                : int.parse(controller.total_projec.value),
+                          ),
+                          _StatItem(
+                            icon: LucideIcons.checkSquare,
+                            title: "My Tasks",
+                            count: 0,
+                          ),
+                        ],
+                      )),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: const [
-                      _StatItem(title: "Project Collaborator", count: 0),
-                      _StatItem(title: "Task Collaborator", count: 0),
+                      _StatItem(
+                        icon: LucideIcons.users,
+                        title: "Project Collaborator",
+                        count: 0,
+                      ),
+                      _StatItem(
+                        icon: LucideIcons.clipboardList,
+                        title: "Task Collaborator",
+                        count: 0,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Divider(),
+                  const Divider(height: 1),
                   const SizedBox(height: 16),
-                  const _StatItem(title: "Comments", count: 1),
+                  const _StatItem(
+                    icon: LucideIcons.messageCircle,
+                    title: "Comments",
+                    count: 1,
+                  ),
                 ],
               ),
             ),
@@ -133,6 +175,7 @@ class _AccountViewState extends State<AccountView> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+                color: AppColors.text,
               ),
             ),
             const SizedBox(height: 12),
@@ -143,20 +186,19 @@ class _AccountViewState extends State<AccountView> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-  showDialog(
-    context: context,
-    builder: (_) =>  InviteTeamDialog(),
-  );
-},
-
-                    icon: const Icon(Icons.group_add_rounded, size: 20,color: Colors.white),
-                    label: const Text("Invite to Team",
-                        style: TextStyle(color: Colors.white)),
+                      showDialog(
+                        context: context,
+                        builder: (_) => InviteTeamDialog(),
+                      );
+                    },
+                    icon: const Icon(LucideIcons.userPlus, size: 20, color: Colors.white),
+                    label: const Text("Invite to Team", style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
+                      elevation: 3,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       textStyle: const TextStyle(fontSize: 14),
                     ),
@@ -168,13 +210,13 @@ class _AccountViewState extends State<AccountView> {
                     onPressed: () {
                       Get.to(ManageTeamModal());
                     },
-                    icon: const Icon(Icons.manage_accounts_outlined, size: 20),
+                    icon: const Icon(LucideIcons.settings, size: 20),
                     label: const Text("Manage Team"),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       side: BorderSide(color: AppColors.primary),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       foregroundColor: AppColors.primary,
                       textStyle: const TextStyle(fontSize: 14),
@@ -195,24 +237,32 @@ class _AccountViewState extends State<AccountView> {
 class _StatItem extends StatelessWidget {
   final String title;
   final int count;
+  final IconData icon;
 
-  const _StatItem({required this.title, required this.count});
+  const _StatItem({
+    required this.title,
+    required this.count,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Icon(icon, color: AppColors.primary, size: 22),
+        const SizedBox(height: 6),
         Text(
           count.toString(),
           style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: AppColors.text,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           title,
-          style: const TextStyle(fontSize: 13, color: Colors.grey),
+          style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],

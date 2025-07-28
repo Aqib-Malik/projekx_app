@@ -61,6 +61,33 @@ class ProjectController extends GetxController {
 
 
 
+ Future<void> updateProject({   
+    required String projId,
+    required Map<String, dynamic> fieldsToUpdate,
+  }) async {
+    if (fieldsToUpdate.isEmpty) return;
+    try {
+      isLoading.value = true;
+      await ProjectService.updateProject(projId, fieldsToUpdate);
+      await fetchProjects();
+      Get.snackbar(
+        'Success',
+        'Project updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.primaryColor,
+        colorText: Get.theme.scaffoldBackgroundColor,
+      );
+    } catch (e) {
+      print('Error updating project: $e');
+      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+
+
   Future<void> deleteProject(String projectId) async {
   isLoading.value = true;
   try {

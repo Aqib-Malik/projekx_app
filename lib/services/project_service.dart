@@ -17,7 +17,8 @@ class ProjectService {
     }
 
     final url =
-        'https://projekx.bubbleapps.io/api/1.1/obj/project';
+        // 'https://projekx.bubbleapps.io/api/1.1/obj/project';
+        'https://projekx.bubbleapps.io/api/1.1/obj/project?constraints=[{"key":"Created By","constraint_type":"equals","value":"$userId"}]';
 
     final response = await http.get(
       Uri.parse(url),
@@ -100,6 +101,26 @@ static Future<bool> addProject({
   print("Delete response: ${response.body}");
 
   return response.statusCode == 204;
+}
+
+
+ static Future<void> updateProject(String projId, Map<String, dynamic> fieldsToUpdate) async {
+  if (fieldsToUpdate.isEmpty) return;
+
+  try {
+    print(fieldsToUpdate);
+    final response = await http.patch(
+      Uri.parse('https://projekx.bubbleapps.io/api/1.1/obj/project/$projId'),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(fieldsToUpdate),
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to update project: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error updating project: $e');
+  }
 }
 
 }

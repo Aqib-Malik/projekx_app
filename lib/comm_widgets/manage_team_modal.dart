@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:projekx_app/comm_widgets/empty_state_widget.dart';
+import 'package:projekx_app/comm_widgets/user_tile.dart';
 import 'package:projekx_app/common/colors.dart';
 import 'package:projekx_app/modules/account_module/account_controler.dart';
 import 'package:projekx_app/models/user.dart';
@@ -21,7 +23,7 @@ class _ManageTeamModalState extends State<ManageTeamModal> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.background,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -54,30 +56,19 @@ class _ManageTeamModalState extends State<ManageTeamModal> {
                           children: [
                             /// My Team Tab
                             Obx(() => controller.myTeam.isEmpty
-                                ? _buildEmptyState('No team members yet.')
+                                ? buildEmptyState(context,'No team members yet.')
                                 : ListView.builder(
                                     itemCount: controller.myTeam.length,
                                     itemBuilder: (context, index) {
                                       UserModel user = controller.myTeam[index];
-                                      return ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundImage: user.avatarUrl != null
-                                              ? NetworkImage(user.avatarUrl!)
-                                              : null,
-                                          child:  Icon(Icons.person)
-                                              
-                                        ),
-                                        title: Text(user.name),
-                                        subtitle: Text(user.email),
-                                        trailing: Text(user.plan),
-                                      );
+                                      return buildUserTile(user);
                                     },
                                   )),
         
                             /// Invite Received Tab
                             // Inside TabBarView > inviteReceived tab
         Obx(() => controller.invitesReceived.isEmpty
-            ? _buildEmptyState('No invites received yet.')
+            ? buildEmptyState(context,'No invites received yet.')
             : ListView.builder(
           itemCount: controller.invitesReceived.length,
           itemBuilder: (context, index) {
@@ -218,16 +209,5 @@ Widget _buildInviteCard(UserModel user,controller) {
     ),
   );
 }
- Widget _buildEmptyState(String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text(
-          message,
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
+
 }

@@ -6,6 +6,7 @@ class TaskModel {
   final String? color;
   final DateTime? dueDate;
   final List<String> attachments;
+  final String? assignedToUser; 
 
   TaskModel({
     required this.id,
@@ -15,6 +16,7 @@ class TaskModel {
     this.color,
     this.dueDate,
     this.attachments = const [],
+    this.assignedToUser, 
   });
 
   factory TaskModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class TaskModel {
       attachments: json["attachment_list_custom_attachment"] != null
           ? List<String>.from(json["attachment_list_custom_attachment"])
           : [],
+      assignedToUser: json["asigned_to_user"], 
     );
   }
 }
