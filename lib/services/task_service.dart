@@ -10,6 +10,8 @@ class TaskService {
     try {
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('auth_token') ?? '';
+        final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('auth_token') ?? '';
       final url = Uri.parse('$baseUrl?constraints=[{"key":"project_custom_project","constraint_type":"equals","value":"$projectId"}]');
       final response = await http.get(url, headers: {
       'Authorization': 'Bearer $token',
@@ -92,24 +94,21 @@ class TaskService {
     String? asigned_to_user
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('auth_token') ?? '';
       final body = {
         "name_text": name,
         "project_custom_project": projectId,
         "taskstatus_option_taskstatus": status,
+        // "Created By": user_id,
       };
 
       if (color != null) body["task_colour_text"] = color;
+      // if (description != null) body["description"] = description;
       if (asigned_to_user != null) body["asigned_to_user"] = asigned_to_user;
       if (dueDate != null) body["duedate_date"] = dueDate.toUtc().toIso8601String();
 
       final response = await http.post(
         Uri.parse(baseUrl),
-        headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
+        headers: {"Content-Type": "application/json"},
         body: json.encode(body),
       );
 
@@ -117,6 +116,7 @@ class TaskService {
         throw Exception('Failed to create task: ${response.statusCode}');
       }
     } catch (e) {
+      print(e);
       throw Exception('Error creating task: $e');
     }
   }
