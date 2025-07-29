@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'package:projekx_app/comm_widgets/delete_dialog.dart';
 import 'package:projekx_app/comm_widgets/empty_state_widget.dart';
 import 'package:projekx_app/common/colors.dart';
@@ -35,7 +36,13 @@ class ProjectListView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: GestureDetector(
-              onTap: () => Get.to(AccountView()),
+              onTap: () {
+
+                showDeleteDialog(context, 'logout', 'Are you sure you want to logout?', onConfirm: (){
+                  Get.find<AccountController>().logout();
+                });
+                
+              },
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
@@ -43,7 +50,7 @@ class ProjectListView extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  LucideIcons.user,
+                  LucideIcons.logOut,
                   color: AppColors.primary,
                   size: 26,
                 ),
@@ -101,210 +108,229 @@ class ProjectListView extends StatelessWidget {
                 children: [
                   BounceIn(
                     child: Card(
-  color: Colors.white,
-  elevation: 4,
-  margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(16),
-  ),
-  shadowColor: AppColors.primary.withOpacity(0.08),
-  child: InkWell(
-    borderRadius: BorderRadius.circular(16),
-    onTap: () {
-      Get.to(ProjectDetailView(project: project));
-    },
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top row with icon and status
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 26,
-                backgroundColor: AppColors.primary.withOpacity(0.1),
-                child: const Icon(
-                  LucideIcons.folderKanban,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      project.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.text,
+                      color: Colors.white,
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 6,
+                        horizontal: 2,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      project.description.isNotEmpty
-                          ? project.description
-                          : "No description",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: project.status == "Active"
-                      ? AppColors.primary.withOpacity(0.12)
-                      : AppColors.error.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  project.status,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: project.status == "Active"
-                        ? AppColors.primary
-                        : AppColors.error,
-                  ),
-                ),
-              ),
-            ],
-          ),
+                      shadowColor: AppColors.primary.withOpacity(0.08),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Get.to(ProjectDetailView(project: project));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 26,
+                                    backgroundColor: AppColors.primary
+                                        .withOpacity(0.1),
+                                    child: const Icon(
+                                      LucideIcons.folderKanban,
+                                      color: AppColors.primary,
+                                      size: 22,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          project.name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.text,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          project.description.isNotEmpty
+                                              ? project.description
+                                              : "No description",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: project.status == "Active"
+                                          ? AppColors.primary.withOpacity(0.12)
+                                          : AppColors.error.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      project.status,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: project.status == "Active"
+                                            ? AppColors.primary
+                                            : AppColors.error,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-          const SizedBox(height: 12),
+                              const SizedBox(height: 12),
 
-          // Surprise badge or tag row
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.primary, AppColors.primary.withOpacity(0.7)],
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  "ID: ${project.id.substring(0, 6)}",
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              if (project.votesQty > 5)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    "Top Voted",
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.orange,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColors.primary,
+                                          AppColors.primary.withOpacity(0.7),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      "ID: ${project.id.substring(0, 6)}",
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  if (project.votesQty > 5)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Text(
+                                        "Top Voted",
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
 
-          const SizedBox(height: 12),
+                              const SizedBox(height: 12),
 
-          // Votes and delete row
-          Row(
-            children: [
-              const Icon(
-                LucideIcons.vote,
-                size: 16,
-                color: AppColors.primary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${project.votesQty} votes',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.text,
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(
-                  LucideIcons.trash2,
-                  size: 18,
-                  color: Colors.redAccent,
-                ),
-                tooltip: 'Delete',
-                onPressed: () => showDeleteDialog(
-                  context,
-                  "Delete Project",
-                  "Are you sure you want to delete this project? This action cannot be undone.",
-                  onConfirm: () {
-                    controller.deleteProject(project.id);
-                    Get.offAll(ProjectListView());
-                  },
-                ),
-              ),
-            ],
-          ),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    LucideIcons.vote,
+                                    size: 16,
+                                    color: AppColors.primary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${project.votesQty} votes',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.text,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    icon: const Icon(
+                                      LucideIcons.trash2,
+                                      size: 18,
+                                      color: Colors.redAccent,
+                                    ),
+                                    tooltip: 'Delete',
+                                    onPressed: () => showDeleteDialog(
+                                      context,
+                                      "Delete Project",
+                                      "Are you sure you want to delete this project? This action cannot be undone.",
+                                      onConfirm: () {
+                                        controller.deleteProject(project.id);
+                                        Get.offAll(ProjectListView());
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-          // Add team members if missing
-          if (project.userIds == null || project.userIds.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: GestureDetector(
-                onTap: () => _showAddMembersSheet(context, project.id),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.07),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(
-                        LucideIcons.userPlus,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        "Add Team Members",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w500,
+                              if (project.userIds == null ||
+                                  project.userIds.isEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: GestureDetector(
+                                    onTap: () => _showAddMembersSheet(
+                                      context,
+                                      project.id,
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withOpacity(
+                                          0.07,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: const [
+                                          Icon(
+                                            LucideIcons.userPlus,
+                                            size: 16,
+                                            color: AppColors.primary,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            "Add Team Members",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.primary,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    ),
-  ),
-)
-
-                  ),
-
-                  /// ✅ add this: if no team members, show add button
                 ],
               ),
             ),
@@ -417,12 +443,11 @@ class ProjectListView extends StatelessWidget {
                 onPressed: () async {
                   if (nameController.text.trim().isEmpty ||
                       descController.text.trim().isEmpty) {
-                    Get.snackbar(
+                    customTopSnackbar(
+                      Get.context!,
                       "Missing Info",
                       "Project name and description cannot be empty",
-                      backgroundColor: Colors.redAccent,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.BOTTOM,
+                      SnackbarType.error,
                     );
                     return;
                   }
@@ -523,12 +548,11 @@ class ProjectListView extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () async {
                   if (selectedUserIds.isEmpty) {
-                    Get.snackbar(
+                    customTopSnackbar(
+                      Get.context!,
                       "Select members",
                       "Please select at least one member",
-                      backgroundColor: Colors.redAccent,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.BOTTOM,
+                      SnackbarType.error,
                     );
                     return;
                   }

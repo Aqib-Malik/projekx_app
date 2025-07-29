@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/project_model.dart';
 // https://projekx.bubbleapps.io/api/1.1/obj/project?constraints=[{"key":"Created By","constraint_type":"equals","value":"1753544673170x505399949150664000"}]
 class ProjectService {
-  /// Fetch only projects created by the current user
+
   static Future<List<ProjectModel>> fetchProjects() async {
     print("Fetching projects...");
 
@@ -37,7 +37,7 @@ class ProjectService {
       throw Exception("Failed to load projects");
     }
   }
-/// Add a new project for the current user, including team members
+
 static Future<bool> addProject({
   required String name,
   required String description,
@@ -114,7 +114,7 @@ static Future<bool> addProject({
       headers: {"Content-Type": "application/json"},
       body: json.encode(fieldsToUpdate),
     );
-
+    print(response.statusCode);
     if (response.statusCode != 204) {
       throw Exception('Failed to update project: ${response.statusCode}');
     }

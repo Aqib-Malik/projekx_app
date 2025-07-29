@@ -40,7 +40,7 @@ void showDeleteDialog(
     ),
     confirm: ElevatedButton.icon(
       icon: const Icon(Icons.delete_outline, size: 18),
-      label: const Text("Delete"),
+      label:  Text(title),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.redAccent,
         foregroundColor: Colors.white,

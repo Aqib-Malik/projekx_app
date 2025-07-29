@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'package:projekx_app/comm_widgets/delete_dialog.dart';
 import 'package:projekx_app/comm_widgets/show_teammember_dialog.dart';
 import 'package:projekx_app/common/colors.dart';
@@ -35,7 +36,6 @@ class ProjectDetailView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /// Logo & project name
             CircleAvatar(
               radius: 48,
               backgroundColor: AppColors.primary.withOpacity(0.1),
@@ -93,7 +93,6 @@ class ProjectDetailView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            /// Description card
             _buildCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +121,6 @@ class ProjectDetailView extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            /// Team members card
             _buildCard(
               child: project.userIds.isNotEmpty
                   ? Column(
@@ -170,7 +168,6 @@ class ProjectDetailView extends StatelessWidget {
                     )
                   : InkWell(
                       onTap: () {
-                        // open bottom sheet to add/select team members
                         _showAddMembersSheet(context, project.id);
                       },
                       borderRadius: BorderRadius.circular(10),
@@ -208,16 +205,15 @@ class ProjectDetailView extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            /// Actions row
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // TODO: Edit logic
+                              _showChangeStatusDialog(context);
                     },
                     icon: const Icon(Icons.check, size: 18),
-                    label: const Text("Mark Complete"),
+                    label: const Text("Change Status"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -263,7 +259,6 @@ class ProjectDetailView extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            /// View Tasks button
             ElevatedButton.icon(
               onPressed: () {
                 Get.to(
@@ -291,7 +286,6 @@ class ProjectDetailView extends StatelessWidget {
     );
   }
 
-  /// Helper to build cards with consistent width & design
   Widget _buildCard({required Widget child}) {
     return Container(
       width: double.infinity,
@@ -311,9 +305,110 @@ class ProjectDetailView extends StatelessWidget {
     );
   }
 
-void _showAddMembersSheet(BuildContext context, String projectId) {
-  final AccountController accountController = Get.find<AccountController>();
-  RxSet<String> selectedUserIds = <String>{}.obs;
+  void _showAddMembersSheet(BuildContext context, String projectId) {
+    final AccountController accountController = Get.find<AccountController>();
+    RxSet<String> selectedUserIds = <String>{}.obs;
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Obx(() {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const Text(
+                "Add Team Members",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              accountController.myTeam.isEmpty
+                  ? const Text(
+                      "No team members available.",
+                      style: TextStyle(color: Colors.grey),
+                    )
+                  : Column(
+                      children: accountController.myTeam.map((member) {
+                        return CheckboxListTile(
+                          value: selectedUserIds.contains(member.id),
+                          title: Text(member.name),
+                          subtitle: Text(
+                            member.email,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          onChanged: (bool? selected) {
+                            if (selected == true) {
+                              selectedUserIds.add(member.id);
+                            } else {
+                              selectedUserIds.remove(member.id);
+                            }
+                          },
+                        );
+                      }).toList(),
+                    ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  if (selectedUserIds.isEmpty) {
+                    customTopSnackbar(
+                      Get.context!,
+                      "Select members",
+                      "Please select at least one member",
+                      SnackbarType.error,
+                    );
+                    return;
+                  }
+
+                  Get.back();
+
+                  await controller.updateProject(
+                    projId: projectId,
+                    fieldsToUpdate: {
+                      "users_list_user": selectedUserIds.toList(),
+                    },
+                  );
+
+                  
+                },
+                icon: const Icon(LucideIcons.userPlus, size: 16),
+                label: const Text("Add Selected Members"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size.fromHeight(44),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+
+
+
+  void _showChangeStatusDialog(BuildContext context) {
+  RxString selectedStatus = project.status.obs; // default to current
 
   Get.bottomSheet(
     Container(
@@ -339,63 +434,42 @@ void _showAddMembersSheet(BuildContext context, String projectId) {
               ),
             ),
             const Text(
-              "Add Team Members",
+              "Change Project Status",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            accountController.myTeam.isEmpty
-                ? const Text(
-                    "No team members available.",
-                    style: TextStyle(color: Colors.grey),
-                  )
-                : Column(
-                    children: accountController.myTeam.map((member) {
-                      return CheckboxListTile(
-                        value: selectedUserIds.contains(member.id),
-                        title: Text(member.name),
-                        subtitle: Text(
-                          member.email,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        onChanged: (bool? selected) {
-                          if (selected == true) {
-                            selectedUserIds.add(member.id);
-                          } else {
-                            selectedUserIds.remove(member.id);
-                          }
-                        },
-                      );
-                    }).toList(),
-                  ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () async {
-                if (selectedUserIds.isEmpty) {
-                  Get.snackbar(
-                    "Select members",
-                    "Please select at least one member",
-                    backgroundColor: Colors.redAccent,
-                    colorText: Colors.white,
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-                  return;
-                }
-
-                // Close bottom sheet first
-                Get.back();
-
-                await controller.updateProject(
-                  projId: projectId,
-                  fieldsToUpdate: {
-                    "users_list_user": selectedUserIds.toList(),
+            Column(
+              children: ["Active", "Completed", "Newest", "Oldest"].map((status) {
+                return RadioListTile<String>(
+                  value: status,
+                  groupValue: selectedStatus.value,
+                  title: Text(status),
+                  activeColor: AppColors.primary,
+                  onChanged: (value) {
+                    if (value != null) {
+                      selectedStatus.value = value;
+                      controller.updateProject(projId: project.id, fieldsToUpdate: {
+                      "status": value,
+                    },);
+                    }
                   },
                 );
+              }).toList(),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () async {
+                Get.back(); // close sheet
 
-                // Navigate back to previous page
-                Get.offAllNamed('projects');
+                await controller.updateProject(
+                  projId: project.id,
+                  fieldsToUpdate: {"status_option_status": selectedStatus.value},
+                );
+
+              
               },
-              icon: const Icon(LucideIcons.userPlus, size: 16),
-              label: const Text("Add Selected Members"),
+              icon: const Icon(Icons.check, size: 16),
+              label: const Text("Update Status"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,

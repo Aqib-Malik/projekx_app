@@ -8,6 +8,7 @@ import 'package:projekx_app/modules/signup/getstarted/getstarted_view.dart';
 import 'package:projekx_app/modules/signup/login/login_binding.dart';
 import 'package:projekx_app/modules/signup/login/login_view.dart';
 import 'package:projekx_app/modules/task_module/my_tasks.dart';
+import 'package:projekx_app/modules/task_module/task_binding.dart';
 import '../modules/signup/signup_view.dart';
 import '../modules/signup/signup_binding.dart';
 
@@ -22,7 +23,8 @@ class AppPages {
     ),
        GetPage(
       name: '/mytask',
-      page: () => MyTaskListView(),
+      page: () => MyTasksView(),
+      binding: TaskBinding(),
     ),
     
     GetPage(

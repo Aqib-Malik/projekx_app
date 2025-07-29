@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/widgets/bouncing_entrances/bounce_in.dart';
 import 'package:get/get.dart';
+import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'package:projekx_app/common/colors.dart';
 import 'package:projekx_app/modules/account_module/account_controler.dart';
 
@@ -91,31 +92,23 @@ class InviteTeamDialog extends StatelessWidget {
                                   final reqList = (user['request_list_user'] as List?) ?? [];
       
                                   if (teamList.contains(currentUserId)) {
-                                    Get.snackbar(
-                                      "Already in Team",
-                                      "This user is already part of your team.",
-                                      backgroundColor: Colors.green.shade50,
-                                      colorText: Colors.green.shade800,
-                                    );
+                                    customTopSnackbar(Get.context!, "Already in Team",
+        "This user is already part of your team.", SnackbarType.success);
+                                    
                                   } else if (reqList.contains(currentUserId)) {
-                                    Get.snackbar(
-                                      "Already Invited",
-                                      "You have already invited this user.",
-                                      backgroundColor: Colors.orange.shade50,
-                                      colorText: Colors.orange.shade800,
-                                    );
+                                    customTopSnackbar(Get.context!, "Already Invited",
+       "You have already invited this user.", SnackbarType.success);
+                                   
                                   } else {
                                     // ✅ not in team & not invited
                                     foundUser.value = user;
                                     emailController.text = user['emailtext_text'] ?? '';
                                   }
                                 } else {
-                                  Get.snackbar(
-                                    "Not Found",
-                                    "No user found with this email.",
-                                    backgroundColor: Colors.red.shade50,
-                                    colorText: Colors.red.shade800,
-                                  );
+
+
+                                   customTopSnackbar(Get.context!,  "Not Found",
+                                           "No user found with this email.", SnackbarType.error);
                                 }
                               } else {
                                 // 📩 Invite mode
@@ -129,19 +122,15 @@ class InviteTeamDialog extends StatelessWidget {
       
                                 if (success) {
                                   Get.back();
-                                  Get.snackbar(
-                                    "Invited",
-                                    "${foundUser.value?['emailtext_text']} has been invited!",
-                                    backgroundColor: Colors.blue.shade50,
-                                    colorText: Colors.blue.shade800,
-                                  );
+                                   customTopSnackbar(Get.context!,  "Invited",
+                                           "${foundUser.value?['emailtext_text']} has been invited!", SnackbarType.success);
+                                 
                                 } else {
-                                  Get.snackbar(
-                                    "Failed",
-                                    "Failed to send invitation. Try again.",
-                                    backgroundColor: Colors.red.shade50,
-                                    colorText: Colors.red.shade800,
-                                  );
+
+                                  customTopSnackbar(Get.context!,"Failed",
+                                           "Failed to send invitation. Try again.", SnackbarType.error);
+
+                                 
                                 }
                               }
                             },

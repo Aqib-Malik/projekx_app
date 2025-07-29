@@ -307,6 +307,11 @@ Future<UserModel?> fetchUserById(String userId) async {
   return null;
 }
 
+Future<void> logout() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear(); 
+  Get.offAllNamed('/getStarted'); 
+}
 
 
 }

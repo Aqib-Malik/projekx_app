@@ -1,48 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'package:projekx_app/models/task.dart';
 import 'package:projekx_app/services/task_service.dart';
 
 class TaskController extends GetxController {
-  RxList<TaskModel> tasks = <TaskModel>[].obs;
-  RxList<TaskModel> myTasks = <TaskModel>[].obs;
+  RxList<TaskModel> tasks = <TaskModel>[].obs; 
+  RxList<TaskModel> myTasks = <TaskModel>[].obs; 
   RxBool isLoading = false.obs;
-
 
   Rx<Color> newTaskColor = Colors.blue.obs;
   RxString newTaskStatus = 'New'.obs;
   Rx<DateTime?> newTaskDueDate = Rx<DateTime?>(null);
 
-
-    Future<void> fetchMyTasks() async {
-    try {
-      isLoading.value = true;
-      final fetchedTasks = await TaskService.fetchMyTasks();
-      myTasks.assignAll(fetchedTasks);
-    } catch (e) {
-      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-
+  
   Future<void> fetchTasksForProject(String projectId) async {
     try {
       isLoading.value = true;
       final fetchedTasks = await TaskService.fetchTasksByProject(projectId);
       tasks.assignAll(fetchedTasks);
     } catch (e) {
-      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+      customTopSnackbar(
+        Get.context!,
+        "Error",
+        e.toString(),
+        SnackbarType.error,
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
+  
+  Future<void> fetchTasksAssignedOrCreatedByMe() async {
+    try {
+      isLoading.value = true;
+      final fetchedMyTasks = await TaskService.fetchMyTasks();
+      myTasks.assignAll(fetchedMyTasks);
+      
+    } catch (e) {
+      print('Error fetching my tasks: $e');
+      customTopSnackbar(
+        Get.context!,
+        "Error",
+        e.toString(),
+        SnackbarType.error,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-
-
-
+  
   Future<void> addTask({
     required String name,
     required String projectId,
@@ -62,22 +71,28 @@ class TaskController extends GetxController {
         asigned_to_user: asigned_to_user,
       );
       await fetchTasksForProject(projectId);
-      Get.snackbar(
-        'Success',
+
+      customTopSnackbar(
+        Get.context!,
+        "Success",
         'Task added successfully',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.scaffoldBackgroundColor,
+        SnackbarType.success,
       );
     } catch (e) {
       print('Error adding task: $e');
-      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+      customTopSnackbar(
+        Get.context!,
+        "Error",
+        e.toString(),
+        SnackbarType.error,
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> updateTaskFields({   
+  
+  Future<void> updateTaskFields({
     required String taskId,
     required Map<String, dynamic> fieldsToUpdate,
     required String projectId,
@@ -87,16 +102,21 @@ class TaskController extends GetxController {
       isLoading.value = true;
       await TaskService.updateTask(taskId, fieldsToUpdate);
       await fetchTasksForProject(projectId);
-      Get.snackbar(
-        'Success',
+
+      customTopSnackbar(
+        Get.context!,
+        "Success",
         'Task updated successfully',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.scaffoldBackgroundColor,
+        SnackbarType.success,
       );
     } catch (e) {
       print('Error updating task: $e');
-      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+      customTopSnackbar(
+        Get.context!,
+        "Error",
+        e.toString(),
+        SnackbarType.error,
+      );
     } finally {
       isLoading.value = false;
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/widgets/bouncing_entrances/bounce_in.dart';
 import 'package:get/get.dart';
+import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'package:projekx_app/common/colors.dart';
 import 'package:projekx_app/modules/account_module/account_controler.dart';
 
@@ -14,36 +15,45 @@ void showTeamMemberDialog(BuildContext context, String userId) async {
 
   final user = await accountController.fetchUserById(userId);
 
-  Get.back(); // close loader
+  Get.back();
 
   if (user != null) {
     Get.dialog(
       BounceIn(
         child: Dialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 30,
+            vertical: 24,
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Avatar with subtle shadow
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
                     radius: 38,
                     backgroundColor: AppColors.primary.withOpacity(0.1),
-                    backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
+                    backgroundImage: user.avatarUrl != null
+                        ? NetworkImage(user.avatarUrl!)
+                        : null,
                     child: user.avatarUrl == null
-                        ? const Icon(Icons.person, color: AppColors.primary, size: 36)
+                        ? const Icon(
+                            Icons.person,
+                            color: AppColors.primary,
+                            size: 36,
+                          )
                         : null,
                   ),
                 ),
                 const SizedBox(height: 16),
-        
-                // Name
+
                 Text(
                   user.name,
                   textAlign: TextAlign.center,
@@ -54,8 +64,7 @@ void showTeamMemberDialog(BuildContext context, String userId) async {
                   ),
                 ),
                 const SizedBox(height: 6),
-        
-                // Email
+
                 Text(
                   user.email,
                   style: const TextStyle(
@@ -64,10 +73,12 @@ void showTeamMemberDialog(BuildContext context, String userId) async {
                   ),
                 ),
                 const SizedBox(height: 6),
-        
-                // Plan badge
+
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
@@ -82,8 +93,7 @@ void showTeamMemberDialog(BuildContext context, String userId) async {
                   ),
                 ),
                 const SizedBox(height: 20),
-        
-                // Close button
+
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -92,10 +102,18 @@ void showTeamMemberDialog(BuildContext context, String userId) async {
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 2,
                     ),
-                    child: const Text("Close", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      "Close",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -105,14 +123,11 @@ void showTeamMemberDialog(BuildContext context, String userId) async {
       ),
     );
   } else {
-    Get.snackbar(
+    customTopSnackbar(
+      Get.context!,
       'Error',
-      'Failed to load user details',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.8),
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(12),
-      borderRadius: 10,
+      "Failed to load user details",
+      SnackbarType.error,
     );
   }
 }

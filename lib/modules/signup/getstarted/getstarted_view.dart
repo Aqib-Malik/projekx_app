@@ -21,16 +21,11 @@ class GetStartedView extends StatelessWidget {
             children: [
               const SizedBox(height: 50),
 
-              /// --- Logo & Heading ---
               Column(
                 children: [
-                  Image.asset(
-                    'assets/logo.png',
-                    width: size.width * 0.45,
-                  ),
+                  Image.asset('assets/icon.png', width: size.width * 0.45),
                   const SizedBox(height: 28),
 
-                  /// Title Text
                   Text(
                     "Project Management For",
                     style: TextStyle(
@@ -41,51 +36,48 @@ class GetStartedView extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 12),
-
-                  /// 👉 Animated Industry Scroller here
+    
                   const SizedBox(height: 30, child: IndustryScroller()),
 
                   const SizedBox(height: 28),
 
-                  /// Description
                   Text.rich(
-  TextSpan(
-    style: TextStyle(
-      fontSize: 15,
-      color: Colors.grey.shade700,
-      height: 1.6,
-    ),
-    children: [
-      const TextSpan(
-        text:
-            "At Projekx, we’re redefining the way teams manage projects, collaborate, and execute various tasks. Our all-in-one project management platform is designed to ",
-      ),
-      TextSpan(
-        text: "help organizations, ",
-        style: TextStyle(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      TextSpan(
-        text: "streamline their workflow, ",
-        style: TextStyle(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      const TextSpan(
-        text: "improve team collaboration, and boost productivity.",
-      ),
-    ],
-  ),
-  textAlign: TextAlign.center,
-),
-
+                    TextSpan(
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.grey.shade700,
+                        height: 1.6,
+                      ),
+                      children: [
+                        const TextSpan(
+                          text:
+                              "At Projekx, we’re redefining the way teams manage projects, collaborate, and execute various tasks. Our all-in-one project management platform is designed to ",
+                        ),
+                        TextSpan(
+                          text: "help organizations, ",
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        TextSpan(
+                          text: "streamline their workflow, ",
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const TextSpan(
+                          text:
+                              "improve team collaboration, and boost productivity.",
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
 
-              /// --- Get Started Button ---
               Column(
                 children: [
                   SizedBox(

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'dart:convert';
 import 'package:projekx_app/common/constants.dart';
 
@@ -21,7 +22,13 @@ class SignupController extends GetxController {
 
   void submit() async {
     if (password.text != confirmPassword.text) {
-      Get.snackbar("Error", "Passwords do not match");
+      
+      customTopSnackbar(
+                      Get.context!,
+                      "Error",
+                      "Passwords do not match",
+                      SnackbarType.error,
+                    );
       return;
     }
 
@@ -38,11 +45,22 @@ class SignupController extends GetxController {
       final data = jsonDecode(response.body);
 print(data);
       if (response.statusCode == 200 && data["response"] != null) {
-        Get.snackbar("Success", "Account created successfully!");
-        // TODO: Navigate or store user session if needed
+        customTopSnackbar(
+                      Get.context!,
+                      "Success",
+                      "Account created successfully!",
+                      SnackbarType.success,
+                    );
       } else {
         print("Signup failed: ${data["message"]}");
         Get.snackbar("Signup Failed", data["message"] ?? "Something went wrong");
+
+        customTopSnackbar(
+                      Get.context!,
+                      "Success",
+                      "Account created successfully!",
+                      SnackbarType.error,
+                    );
       }
     } catch (e) {
       print("Signup error: $e");

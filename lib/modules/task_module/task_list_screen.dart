@@ -2,27 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animator/widgets/bouncing_entrances/bounce_in.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'package:projekx_app/comm_widgets/empty_state_widget.dart';
 import 'package:projekx_app/comm_widgets/show_teammember_dialog.dart';
 import 'package:projekx_app/common/colors.dart';
 import 'package:projekx_app/models/task.dart';
 import 'package:projekx_app/modules/task_module/task_controller.dart';
 
-class TaskListView extends StatelessWidget {
+class TaskListView extends StatefulWidget {
   final String projectId;
   final List<String> userIds;
-  final TaskController controller = Get.find<TaskController>();
-  Rx<Color> newTaskColor = AppColors.primary.obs;
-  RxString newTaskStatus = 'New'.obs;
-  Rx<DateTime?> newTaskDueDate = Rx<DateTime?>(null);
-  RxString assignedUserId = ''.obs;
 
   TaskListView({required this.projectId, Key? key, required this.userIds})
     : super(key: key);
 
   @override
+  State<TaskListView> createState() => _TaskListViewState();
+}
+
+class _TaskListViewState extends State<TaskListView> {
+  final TaskController controller = Get.find<TaskController>();
+
+  Rx<Color> newTaskColor = AppColors.primary.obs;
+
+  RxString newTaskStatus = 'New'.obs;
+
+  Rx<DateTime?> newTaskDueDate = Rx<DateTime?>(null);
+
+  RxString assignedUserId = ''.obs;
+
+  @override
+  @override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    controller.fetchTasksForProject(widget.projectId);
+  });
+}
   Widget build(BuildContext context) {
-    controller.fetchTasksForProject(projectId);
+    
 
     return Scaffold(
       bottomNavigationBar: Padding(
@@ -299,8 +317,6 @@ class TaskListView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                
-
                 Row(
                   children: [
                     const Text('Pick Color:'),
@@ -427,25 +443,28 @@ class TaskListView extends StatelessWidget {
                     ),
                     onPressed: () async {
                       if (nameController.text.trim().isEmpty) {
-                        Get.snackbar(
-                          'Error',
+                        customTopSnackbar(
+                          Get.context!,
+                          "Error",
                           'Task name is required',
-                          snackPosition: SnackPosition.BOTTOM,
+                          SnackbarType.error,
                         );
                         return;
                       }
                       if (controller.newTaskDueDate.value == null) {
-                        Get.snackbar(
-                          'Error',
+                        customTopSnackbar(
+                          Get.context!,
+                          "Error",
                           'Please select a due date',
-                          snackPosition: SnackPosition.BOTTOM,
+                          SnackbarType.error,
                         );
+
                         return;
                       }
 
                       await controller.addTask(
                         name: nameController.text.trim(),
-                        projectId: projectId,
+                        projectId: widget.projectId,
                         status: controller.newTaskStatus.value,
                         color:
                             '#${controller.newTaskColor.value.value.toRadixString(16).substring(2)}',
@@ -505,9 +524,9 @@ class TaskListView extends StatelessWidget {
 
               ListView.builder(
                 shrinkWrap: true,
-                itemCount: userIds.length,
+                itemCount: widget.userIds.length,
                 itemBuilder: (context, index) {
-                  final userId = userIds[index];
+                  final userId = widget.userIds[index];
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
@@ -583,18 +602,20 @@ class TaskListView extends StatelessWidget {
                       : () async {
                           await controller.updateTaskFields(
                             taskId: taskId,
-                            projectId: projectId,
+                            projectId: widget.projectId,
                             fieldsToUpdate: {
                               "asigned_to_user": selectedUserId.value,
                             },
                           );
 
-                          await controller.fetchTasksForProject(projectId);
+                          await controller.fetchTasksForProject(widget.projectId);
                           Get.back();
-                          Get.snackbar(
-                            'Success',
+
+                          customTopSnackbar(
+                            Get.context!,
+                            "Success",
                             'User assigned successfully',
-                            snackPosition: SnackPosition.BOTTOM,
+                            SnackbarType.success,
                           );
                         },
                   style: ElevatedButton.styleFrom(

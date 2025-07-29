@@ -222,11 +222,13 @@ class _AccountViewState extends State<AccountView> {
                       textStyle: const TextStyle(fontSize: 14),
                     ),
                   ),
+                  
                 ),
               ],
             ),
 
             const SizedBox(height: 30),
+            
           ],
         ),
       ),

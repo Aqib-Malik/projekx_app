@@ -8,8 +8,13 @@ class TaskService {
 
   static Future<List<TaskModel>> fetchTasksByProject(String projectId) async {
     try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token') ?? '';
       final url = Uri.parse('$baseUrl?constraints=[{"key":"project_custom_project","constraint_type":"equals","value":"$projectId"}]');
-      final response = await http.get(url);
+      final response = await http.get(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -24,31 +29,59 @@ class TaskService {
     }
   }
 
-  
+
 
   static Future<List<TaskModel>> fetchMyTasks() async {
+  try {
     final prefs = await SharedPreferences.getInstance();
-  final user_id = prefs.getString('user_id') ?? '';
-    try {
-      final url = Uri.parse('$baseUrl?constraints=[{"key":"asigned_to_user","constraint_type":"equals","value":"$user_id"}]');
-      final response = await http.get(url);
-      print(response);
-     
+    final token = prefs.getString('auth_token') ?? '';
+    final userId = prefs.getString('user_id') ?? '';
 
+    if (userId.isEmpty) {
+      throw Exception('No user_id found in local storage');
+    }
+
+    final urlAssigned = Uri.parse(
+      '$baseUrl?constraints=[{"key":"asigned_to_user","constraint_type":"equals","value":"$userId"}]'
+    );
+
+    final urlCreated = Uri.parse(
+      '$baseUrl?constraints=[{"key":"Created By","constraint_type":"equals","value":"$userId"}]'
+    );
+
+    final responses = await Future.wait([
+      http.get(urlAssigned, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      }),
+      http.get(urlCreated, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      }),
+    ]);
+
+    List<TaskModel> tasks = [];
+
+    for (var response in responses) {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> results = data['response']['results'];
-        print(results);
-        return results.map((json) => TaskModel.fromJson(json)).toList();
+        tasks.addAll(results.map((json) => TaskModel.fromJson(json)));
       } else {
-        throw Exception('Failed to load tasks: ${response.statusCode}');
+        print('⚠ Failed to load some tasks: ${response.statusCode}');
       }
-    } catch (e) {
-       print('Error fetching tasks: $e');
-      throw Exception('Error fetching tasks: $e');
     }
-  }
 
+    final uniqueTasks = { for (var task in tasks) task.id : task }.values.toList();
+
+    return uniqueTasks;
+  } catch (e) {
+    throw Exception('Error fetching my tasks: $e');
+  }
+}
+
+
+  
   
   static Future<void> createTask({
     required String name,
@@ -59,6 +92,8 @@ class TaskService {
     String? asigned_to_user
   }) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token') ?? '';
       final body = {
         "name_text": name,
         "project_custom_project": projectId,
@@ -71,7 +106,10 @@ class TaskService {
 
       final response = await http.post(
         Uri.parse(baseUrl),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
         body: json.encode(body),
       );
 
@@ -87,9 +125,14 @@ class TaskService {
   if (fieldsToUpdate.isEmpty) return;
 
   try {
+    final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token') ?? '';
     final response = await http.patch(
       Uri.parse('$baseUrl/$taskId'),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
       body: json.encode(fieldsToUpdate),
     );
 

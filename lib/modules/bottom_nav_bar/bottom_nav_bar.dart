@@ -17,7 +17,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
 
   final List<TabItem> items = [
     TabItem(icon: LucideIcons.layoutGrid, title: 'Projects'),
-    // TabItem(icon: LucideIcons.checkSquare, title: 'Tasks'),
+    TabItem(icon: LucideIcons.checkSquare, title: 'My Tasks'),
     TabItem(icon: LucideIcons.user, title: 'Account'),
   ];
 
@@ -28,7 +28,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
       body: IndexedStack(
         index: selectedIndex,
         children: [ProjectListView(), 
-        // MyTaskListView(),
+        MyTasksView(),
          AccountView()],
       ),
       bottomNavigationBar: BottomBarInspiredOutside(
