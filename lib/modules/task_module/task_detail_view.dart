@@ -26,14 +26,13 @@ class TaskDetailsView extends StatelessWidget {
     required this.dueDate,
     required this.description,
     Key? key,
-  }) : descriptionController = TextEditingController(text: description),
-       super(key: key);
+  })  : descriptionController = TextEditingController(text: description),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print(taskId);
     Rx<Color> selectedColor = Colors.orange.obs;
-    Rx<DateTime?> selectedDueDate = dueDate.obs; // 🌟 store selected date
+    Rx<DateTime?> selectedDueDate = dueDate.obs;
 
     return Scaffold(
       backgroundColor: const Color(0xffF4F6FA),
@@ -61,7 +60,7 @@ class TaskDetailsView extends StatelessWidget {
               Expanded(
                 child: Text(
                   taskTitle,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: Colors.black87,
@@ -76,12 +75,12 @@ class TaskDetailsView extends StatelessWidget {
                     fieldsToUpdate: {"taskstatus_option_taskstatus": "Completed"},
                   );
                 },
-                icon: Icon(LucideIcons.check, size: 16),
-                label: Text("Complete"),
+                icon: const Icon(LucideIcons.check, size: 16),
+                label: const Text("Complete"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green.shade600,
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -90,9 +89,8 @@ class TaskDetailsView extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-          // 🌟 Due date section
           GestureDetector(
             onTap: () async {
               final picked = await showDatePicker(
@@ -104,13 +102,13 @@ class TaskDetailsView extends StatelessWidget {
                   return Theme(
                     data: Theme.of(context).copyWith(
                       colorScheme: ColorScheme.light(
-                        primary: AppColors.primary, // header color
-                        onPrimary: Colors.white,    // header text
-                        onSurface: Colors.black,    // body text
+                        primary: AppColors.primary,
+                        onPrimary: Colors.white,
+                        onSurface: Colors.black,
                       ),
                       textButtonTheme: TextButtonThemeData(
                         style: TextButton.styleFrom(
-                          foregroundColor: AppColors.primary, // button text
+                          foregroundColor: AppColors.primary,
                         ),
                       ),
                     ),
@@ -129,45 +127,17 @@ class TaskDetailsView extends StatelessWidget {
                 );
               }
             },
-            child: Obx(() => Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12.withOpacity(0.08),
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(
-                children: [
-                  Icon(LucideIcons.calendar, size: 18, color: AppColors.primary),
-                  SizedBox(width: 10),
-                  Text(
-                    selectedDueDate.value != null
-                        ? DateFormat('dd MMM, yyyy').format(selectedDueDate.value!)
-                        : "No date",
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  Spacer(),
-                  Icon(Icons.edit_calendar, color: AppColors.primary, size: 18),
-                ],
-              ),
+            child: Obx(() => _infoTile(
+              icon: LucideIcons.calendar,
+              text: selectedDueDate.value != null
+                  ? DateFormat('dd MMM, yyyy').format(selectedDueDate.value!)
+                  : "No date",
+              trailingIcon: Icons.edit_calendar,
             )),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-          // ... keep your description field etc below as you already had
-          // (keeping same style)
-
-          Text(
+          const Text(
             "Description",
             style: TextStyle(
               fontSize: 17,
@@ -175,63 +145,28 @@ class TaskDetailsView extends StatelessWidget {
               color: Colors.black87,
             ),
           ),
-          SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12.withOpacity(0.08),
-                  blurRadius: 6,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: descriptionController,
-              maxLines: 5,
-              decoration: InputDecoration(
-                hintText: "Enter description...",
-                suffixIcon: IconButton(
-                  icon: Icon(LucideIcons.send, color: AppColors.primary),
-                  onPressed: () {
-                    if (descriptionController.text.trim().isEmpty) {
-                      Get.snackbar(
-                        "Error",
-                        "Description cannot be empty",
-                        backgroundColor: Colors.redAccent,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    } else {
-                      controller.updateTaskFields(
-                        taskId: taskId,
-                        projectId: projectId,
-                        fieldsToUpdate: {
-                          "description_text": descriptionController.text.trim(),
-                        },
-                      );
-                    }
+          const SizedBox(height: 10),
+          _editableTextField(
+            controller: descriptionController,
+            hint: "Enter description...",
+            icon: LucideIcons.send,
+            onSubmit: () {
+              if (descriptionController.text.trim().isEmpty) {
+                _showError("Description cannot be empty");
+              } else {
+                controller.updateTaskFields(
+                  taskId: taskId,
+                  projectId: projectId,
+                  fieldsToUpdate: {
+                    "description_text": descriptionController.text.trim(),
                   },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 14,
-                ),
-              ),
-            ),
+                );
+              }
+            },
           ),
-          // ... keep the rest unchanged
-          SizedBox(height: 25),
 
-          Text(
+          const SizedBox(height: 25),
+          const Text(
             "Add Comment",
             style: TextStyle(
               fontSize: 17,
@@ -239,69 +174,35 @@ class TaskDetailsView extends StatelessWidget {
               color: Colors.black87,
             ),
           ),
-          SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12.withOpacity(0.08),
-                  blurRadius: 6,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: commentController,
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: "Write a comment...",
-                suffixIcon: IconButton(
-                  icon: Icon(LucideIcons.send, color: AppColors.primary),
-                  onPressed: () {
-                    if (commentController.text.trim().isEmpty) {
-                      Get.snackbar(
-                        "Error",
-                        "Comment cannot be empty",
-                        backgroundColor: Colors.redAccent,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    } else {
-                      Get.snackbar(
-                        "Success",
-                        "Comment added",
-                        backgroundColor: Colors.green,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      commentController.clear();
-                    }
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 14,
-                ),
-              ),
-            ),
+          const SizedBox(height: 10),
+          _editableTextField(
+            controller: commentController,
+            hint: "Write a comment...",
+            icon: LucideIcons.send,
+            onSubmit: () {
+              if (commentController.text.trim().isEmpty) {
+                _showError("Comment cannot be empty");
+              } else {
+                Get.snackbar(
+                  "Success",
+                  "Comment added",
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                  snackPosition: SnackPosition.BOTTOM,
+                );
+                commentController.clear();
+              }
+            },
           ),
-          SizedBox(height: 25),
+          const SizedBox(height: 25),
 
           Row(
             children: [
-              Text(
+              const Text(
                 "Task Color:",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Obx(
                 () => GestureDetector(
                   onTap: () {
@@ -324,13 +225,13 @@ class TaskDetailsView extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                icon: Icon(LucideIcons.trash, color: Colors.redAccent),
+                icon: const Icon(LucideIcons.trash, color: Colors.redAccent),
                 onPressed: () {},
               ),
               IconButton(
@@ -339,14 +240,98 @@ class TaskDetailsView extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(LucideIcons.x, color: Colors.grey[700]),
-                onPressed: () {
-                  Get.back();
-                },
+                onPressed: () => Get.back(),
               ),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget _infoTile({required IconData icon, required String text, IconData? trailingIcon}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12.withOpacity(0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: AppColors.primary),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+          const Spacer(),
+          if (trailingIcon != null)
+            Icon(trailingIcon, color: AppColors.primary, size: 18),
+        ],
+      ),
+    );
+  }
+
+  Widget _editableTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onSubmit,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12.withOpacity(0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        maxLines: 5,
+        decoration: InputDecoration(
+          hintText: hint,
+          suffixIcon: IconButton(
+            icon: Icon(icon, color: AppColors.primary),
+            onPressed: onSubmit,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showError(String message) {
+    Get.snackbar(
+      "Error",
+      message,
+      backgroundColor: Colors.redAccent,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
     );
   }
 }

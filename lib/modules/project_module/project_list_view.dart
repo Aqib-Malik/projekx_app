@@ -21,7 +21,7 @@ class ProjectListView extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
-          "Projects",
+          "My Projects",
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 20,

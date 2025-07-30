@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/widgets/bouncing_entrances/bounce_in.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:projekx_app/comm_widgets/custom_snackbar.dart';
 import 'package:projekx_app/comm_widgets/empty_state_widget.dart';
 import 'package:projekx_app/comm_widgets/show_teammember_dialog.dart';
@@ -13,8 +13,7 @@ class TaskListView extends StatefulWidget {
   final String projectId;
   final List<String> userIds;
 
-  TaskListView({required this.projectId, Key? key, required this.userIds})
-    : super(key: key);
+  TaskListView({required this.projectId, Key? key, required this.userIds}) : super(key: key);
 
   @override
   State<TaskListView> createState() => _TaskListViewState();
@@ -24,24 +23,21 @@ class _TaskListViewState extends State<TaskListView> {
   final TaskController controller = Get.find<TaskController>();
 
   Rx<Color> newTaskColor = AppColors.primary.obs;
-
   RxString newTaskStatus = 'New'.obs;
-
   Rx<DateTime?> newTaskDueDate = Rx<DateTime?>(null);
-
+  RxString newTaskDescription = ''.obs;
   RxString assignedUserId = ''.obs;
 
   @override
-  @override
-void initState() {
-  super.initState();
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    controller.fetchTasksForProject(widget.projectId);
-  });
-}
-  Widget build(BuildContext context) {
-    
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchTasksForProject(widget.projectId);
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
@@ -58,22 +54,13 @@ void initState() {
               elevation: 2,
             ),
             icon: const Icon(Icons.add, size: 20),
-            label: const Text(
-              "Add New Task",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            onPressed: () {
-              _showAddTaskSheet(context);
-            },
+            label: const Text("Add New Task", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            onPressed: () => _showAddTaskSheet(context),
           ),
         ),
       ),
-
       appBar: AppBar(
-        title: const Text(
-          'Tasks',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
-        ),
+        title: const Text('Tasks', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20)),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -111,40 +98,25 @@ void initState() {
                                 width: 10,
                                 height: 10,
                                 decoration: BoxDecoration(
-                                  color: task.color != null
-                                      ? Color(_hexToColor(task.color!))
-                                      : AppColors.primary,
+                                  color: task.color != null ? Color(_hexToColor(task.color!)) : AppColors.primary,
                                   shape: BoxShape.circle,
                                 ),
                               ),
                               const SizedBox(width: 10),
-
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      task.name,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.text,
-                                      ),
-                                    ),
+                                    Text(task.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.text)),
                                     const SizedBox(height: 4),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 3,
-                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
                                         color: task.status == "Completed"
                                             ? Colors.green.withOpacity(0.12)
                                             : task.status == "In progress"
-                                            ? Colors.orange.withOpacity(0.12)
-                                            : AppColors.primary.withOpacity(
-                                                0.12,
-                                              ),
+                                                ? Colors.orange.withOpacity(0.12)
+                                                : AppColors.primary.withOpacity(0.12),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -155,8 +127,8 @@ void initState() {
                                           color: task.status == "Completed"
                                               ? Colors.green
                                               : task.status == "In progress"
-                                              ? Colors.orange
-                                              : AppColors.primary,
+                                                  ? Colors.orange
+                                                  : AppColors.primary,
                                         ),
                                       ),
                                     ),
@@ -166,92 +138,63 @@ void initState() {
                             ],
                           ),
                           const SizedBox(height: 12),
-
+                          if (task.description != null && task.description!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Text(task.description!, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                            ),
                           if (task.dueDate != null)
                             Row(
                               children: [
-                                Icon(
-                                  Icons.calendar_today,
-                                  size: 14,
-                                  color: Colors.grey[600],
-                                ),
+                                const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
                                 const SizedBox(width: 6),
-                                Text(
-                                  'Due: ${task.dueDate!.toLocal().toString().split(' ')[0]}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
+                                Text('Due: ${task.dueDate!.toLocal().toString().split(' ')[0]}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                               ],
                             ),
-
-                          if (task.attachments.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.attach_file,
-                                  size: 14,
-                                  color: Colors.grey[600],
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${task.attachments.length} attachment${task.attachments.length > 1 ? 's' : ''}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-
                           const SizedBox(height: 12),
-
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: OutlinedButton.icon(
-                              onPressed: () {
-                                if (task.assignedToUser == null) {
-                                  _showAssignUserDialog(context, task.id);
-                                } else {
-                                  showTeamMemberDialog(
-                                    context,
-                                    task.assignedToUser!,
-                                  );
-                                }
-                              },
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  if (task.assignedToUser == null) {
+                                    _showAssignUserDialog(context, task.id);
+                                  } else {
+                                    showTeamMemberDialog(context, task.assignedToUser!);
+                                  }
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  minimumSize: Size.zero,
+                                  side: const BorderSide(color: AppColors.primary),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                 ),
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                side: BorderSide(color: AppColors.primary),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                icon: Icon(task.assignedToUser == null ? Icons.person_add_alt_1 : Icons.visibility, size: 16, color: AppColors.primary),
+                                label: Text(task.assignedToUser == null ? "Assign User" : "View Assigned User", style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w500)),
+                              ),
+                              if (task.status != 'Completed')
+                                OutlinedButton.icon(
+                                  onPressed: () async {
+                                    await controller.updateTaskFields(
+                                      taskId: task.id,
+                                      projectId: widget.projectId,
+                                      fieldsToUpdate: {"taskstatus_option_taskstatus": "Completed"},
+                                    );
+                                    await controller.fetchTasksForProject(widget.projectId);
+                                    customTopSnackbar(context, "Task Updated", "Task marked as completed", SnackbarType.success);
+                                  },
+                                  icon: const Icon(Icons.check_circle_outline, size: 16, color: Colors.green),
+                                  label: const Text("Mark Complete", style: TextStyle(fontSize: 12, color: Colors.green)),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Colors.green),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    minimumSize: Size.zero,
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  ),
                                 ),
-                              ),
-                              icon: Icon(
-                                task.assignedToUser == null
-                                    ? Icons.person_add_alt_1
-                                    : Icons.visibility,
-                                size: 16,
-                                color: AppColors.primary,
-                              ),
-                              label: Text(
-                                task.assignedToUser == null
-                                    ? "Assign User"
-                                    : "View Assigned User",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
+                            ],
                           ),
                         ],
                       ),
@@ -268,9 +211,7 @@ void initState() {
 
   int _hexToColor(String hex) {
     hex = hex.replaceAll('#', '');
-    if (hex.length == 6) {
-      hex = 'FF$hex';
-    }
+    if (hex.length == 6) hex = 'FF$hex';
     return int.parse(hex, radix: 16);
   }
 
@@ -289,78 +230,55 @@ void initState() {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[400],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                const Text(
-                  "Create New Task",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                const Text("Create New Task", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
-
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
                     labelText: 'Task Name *',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
                 const SizedBox(height: 16),
-
+                TextField(
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onChanged: (value) => controller.newTaskDescription.value = value,
+                ),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     const Text('Pick Color:'),
                     const SizedBox(width: 12),
                     GestureDetector(
                       onTap: () async {
-                        Color? picked = await showDialog<Color>(
+                        Color selected = controller.newTaskColor.value;
+                        await showDialog(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text('Select Color'),
-                            content: Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children:
-                                  [
-                                    Colors.red,
-                                    Colors.green,
-                                    Colors.blue,
-                                    Colors.orange,
-                                    Colors.purple,
-                                    Colors.teal,
-                                  ].map((color) {
-                                    return GestureDetector(
-                                      onTap: () =>
-                                          Navigator.of(context).pop(color),
-                                      child: Container(
-                                        width: 30,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          color: color,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.grey.shade400,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                            ),
-                          ),
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Select Color'),
+                              content: SingleChildScrollView(
+                                child: BlockPicker(
+                                  pickerColor: selected,
+                                  onColorChanged: (color) => selected = color,
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    controller.newTaskColor.value = selected;
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Select'),
+                                ),
+                              ],
+                            );
+                          },
                         );
-                        if (picked != null) {
-                          controller.newTaskColor.value = picked;
-                        }
                       },
                       child: Container(
                         width: 26,
@@ -375,7 +293,6 @@ void initState() {
                   ],
                 ),
                 const SizedBox(height: 16),
-
                 Row(
                   children: [
                     Expanded(
@@ -385,9 +302,7 @@ void initState() {
                             : "No due date selected *",
                         style: TextStyle(
                           fontSize: 13,
-                          color: controller.newTaskDueDate.value != null
-                              ? Colors.black87
-                              : Colors.redAccent,
+                          color: controller.newTaskDueDate.value != null ? Colors.black87 : Colors.redAccent,
                         ),
                       ),
                     ),
@@ -398,90 +313,45 @@ void initState() {
                           initialDate: DateTime.now(),
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2100),
-
-                          builder: (context, child) {
-                            return Theme(
-                              data: Theme.of(context).copyWith(
-                                colorScheme: ColorScheme.light(
-                                  primary: AppColors.primary,
-                                  onPrimary: Colors.white,
-                                  onSurface: Colors.black87,
-                                ),
-                                dialogBackgroundColor: Colors.white,
-                                textButtonTheme: TextButtonThemeData(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                              child: child!,
-                            );
-                          },
                         );
-                        if (picked != null) {
-                          controller.newTaskDueDate.value = picked;
-                        }
+                        if (picked != null) controller.newTaskDueDate.value = picked;
                       },
-
                       icon: const Icon(Icons.date_range, size: 18),
                       label: const Text("Pick Date"),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     onPressed: () async {
                       if (nameController.text.trim().isEmpty) {
-                        customTopSnackbar(
-                          Get.context!,
-                          "Error",
-                          'Task name is required',
-                          SnackbarType.error,
-                        );
+                        customTopSnackbar(context, "Error", 'Task name is required', SnackbarType.error);
                         return;
                       }
                       if (controller.newTaskDueDate.value == null) {
-                        customTopSnackbar(
-                          Get.context!,
-                          "Error",
-                          'Please select a due date',
-                          SnackbarType.error,
-                        );
-
+                        customTopSnackbar(context, "Error", 'Please select a due date', SnackbarType.error);
                         return;
                       }
-
                       await controller.addTask(
                         name: nameController.text.trim(),
                         projectId: widget.projectId,
                         status: controller.newTaskStatus.value,
-                        color:
-                            '#${controller.newTaskColor.value.value.toRadixString(16).substring(2)}',
+                        color: '#${controller.newTaskColor.value.value.toRadixString(16).substring(2)}',
                         dueDate: controller.newTaskDueDate.value,
-                        asigned_to_user: assignedUserId.value.isNotEmpty
-                            ? assignedUserId.value
-                            : null,
+                        description: controller.newTaskDescription.value,
+                        asigned_to_user: assignedUserId.value.isNotEmpty ? assignedUserId.value : null,
                       );
                       Get.back();
                     },
-                    child: const Text(
-                      "Add Task",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: const Text("Add Task", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -492,7 +362,6 @@ void initState() {
       isScrollControlled: true,
     );
   }
-
   void _showAssignUserDialog(BuildContext context, String taskId) {
     RxString selectedUserId = ''.obs;
 

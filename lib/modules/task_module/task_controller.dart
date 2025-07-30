@@ -8,9 +8,10 @@ class TaskController extends GetxController {
   RxList<TaskModel> tasks = <TaskModel>[].obs; 
   RxList<TaskModel> myTasks = <TaskModel>[].obs; 
   RxBool isLoading = false.obs;
-
+RxString taskStatus = "New".obs;
   Rx<Color> newTaskColor = Colors.blue.obs;
   RxString newTaskStatus = 'New'.obs;
+  RxString newTaskDescription = 'New'.obs;
   Rx<DateTime?> newTaskDueDate = Rx<DateTime?>(null);
 
   
@@ -57,6 +58,7 @@ class TaskController extends GetxController {
     required String projectId,
     String status = "New",
     String? color,
+    String? description,
     DateTime? dueDate,
     String? asigned_to_user,
   }) async {
@@ -71,6 +73,7 @@ class TaskController extends GetxController {
         asigned_to_user: asigned_to_user,
       );
       await fetchTasksForProject(projectId);
+      await fetchTasksAssignedOrCreatedByMe();
 
       customTopSnackbar(
         Get.context!,
@@ -102,6 +105,7 @@ class TaskController extends GetxController {
       isLoading.value = true;
       await TaskService.updateTask(taskId, fieldsToUpdate);
       await fetchTasksForProject(projectId);
+      await fetchTasksAssignedOrCreatedByMe();
 
       customTopSnackbar(
         Get.context!,

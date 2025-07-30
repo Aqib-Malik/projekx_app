@@ -10,8 +10,6 @@ class TaskService {
     try {
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('auth_token') ?? '';
-        final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('auth_token') ?? '';
       final url = Uri.parse('$baseUrl?constraints=[{"key":"project_custom_project","constraint_type":"equals","value":"$projectId"}]');
       final response = await http.get(url, headers: {
       'Authorization': 'Bearer $token',
@@ -94,6 +92,9 @@ class TaskService {
     String? asigned_to_user
   }) async {
     try {
+    
+      final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token') ?? '';
       final body = {
         "name_text": name,
         "project_custom_project": projectId,
@@ -108,7 +109,10 @@ class TaskService {
 
       final response = await http.post(
         Uri.parse(baseUrl),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
         body: json.encode(body),
       );
 
